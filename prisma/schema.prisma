@@ -1,0 +1,125 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DIRECT_URL")
+}
+enum PaymentMethod{
+  CASH
+  CARD
+}
+model Owner{
+  id String @id @default(uuid())
+  login String @unique
+  email String @unique
+  phone_number String @unique
+  password_hash String
+  first_name String
+  second_name String?
+  last_name String
+  birth_date DateTime
+  store_nets StoreNet[]
+}
+model StoreNet {
+  id String @id @default(uuid())
+  name String @unique
+  description String?
+  owner_id String
+  owner Owner @relation(fields: [owner_id], references: [id], onDelete: NoAction)
+  stores Store[]
+}
+model Store{
+  id String @id @default(uuid())
+  name String @unique
+  description String?
+  number String?
+  address String
+  map_url String?
+  store_net_id String
+  store_net StoreNet @relation(fields: [store_net_id], references: [id], onDelete: NoAction)
+  employees Employee[]
+  warehouses Warehouse[]
+  pos_terminals POSTerminal[]
+}
+model Employee{
+  id String @id @default(uuid())
+  login String @unique
+  email String @unique
+  phone_number String @unique
+  password_hash String
+  first_name String
+  second_name String?
+  last_name String
+  birth_date DateTime
+  role String
+  workplace_id String
+  store Store @relation(fields: [workplace_id], references: [id], onDelete: NoAction)
+  shifts Shift[]
+}
+
+model POSTerminal{
+  id String @id @default(uuid())
+  name String @unique
+  store_id String
+  store Store @relation(fields: [store_id], references: [id], onDelete: NoAction)
+  shifts Shift[]
+}
+model Shift{
+  id String @id @default(uuid())
+  started_at DateTime
+  ended_at DateTime?
+  employee_id String
+  employee Employee @relation(fields: [employee_id], references: [id], onDelete: NoAction)
+  pos_terminal_id String
+  pos_terminal POSTerminal @relation(fields: [pos_terminal_id], references: [id], onDelete: NoAction)
+  sales Sales[]
+}
+model Warehouse{
+  id String @id @default(uuid())
+  name String @unique
+  of_store_id String
+  store Store @relation(fields: [of_store_id], references: [id], onDelete: NoAction)
+  products Product[]
+}
+model Product{
+  id String @id @default(uuid())
+  name String
+  description String?
+  barcode String @unique
+  price Decimal @db.Decimal(10, 2)
+  quantity Int
+  image String?
+  expires_at DateTime?
+  warehouse_id String
+  warehouse Warehouse @relation(fields: [warehouse_id], references: [id], onDelete: NoAction)
+  sale_items SaleItem[]
+}
+model Sales{
+  id String @id @default(uuid())
+  shift_id String
+  shift Shift @relation(fields: [shift_id], references: [id], onDelete: NoAction)
+  sum Decimal @db.Decimal(10, 2)
+  change_due  Decimal @db.Decimal(10, 2)
+  payment_method PaymentMethod
+  created_at DateTime @default(now())
+  sale_items SaleItem[]
+}
+model SaleItem{
+  id String @id @default(uuid())
+  product_id String
+  product Product @relation(fields: [product_id], references: [id], onDelete: NoAction)
+  sales_id String
+  sale Sales @relation(fields: [sales_id], references: [id], onDelete: NoAction)
+  quantity Int
+  unit_price Decimal @db.Decimal(10, 2)
+  total_price Decimal @db.Decimal(10, 2)
+}
