@@ -27,6 +27,7 @@ model Owner{
   last_name String
   birth_date DateTime
   store_nets StoreNet[]
+  created_at DateTime @default(now())
 }
 model StoreNet {
   id String @id @default(uuid())
@@ -35,6 +36,7 @@ model StoreNet {
   owner_id String
   owner Owner @relation(fields: [owner_id], references: [id], onDelete: NoAction)
   stores Store[]
+  created_at DateTime @default(now())
 }
 model Store{
   id String @id @default(uuid())
@@ -48,6 +50,7 @@ model Store{
   employees Employee[]
   warehouses Warehouse[]
   pos_terminals POSTerminal[]
+  created_at DateTime @default(now())
 }
 model Employee{
   id String @id @default(uuid())
@@ -63,6 +66,8 @@ model Employee{
   workplace_id String
   store Store @relation(fields: [workplace_id], references: [id], onDelete: NoAction)
   shifts Shift[]
+  created_at DateTime @default(now())
+  fired_at DateTime?
 }
 
 model POSTerminal{
@@ -71,6 +76,7 @@ model POSTerminal{
   store_id String
   store Store @relation(fields: [store_id], references: [id], onDelete: NoAction)
   shifts Shift[]
+  created_at DateTime @default(now())
 }
 model Shift{
   id String @id @default(uuid())
@@ -81,6 +87,7 @@ model Shift{
   pos_terminal_id String
   pos_terminal POSTerminal @relation(fields: [pos_terminal_id], references: [id], onDelete: NoAction)
   sales Sales[]
+  
 }
 model Warehouse{
   id String @id @default(uuid())
@@ -88,6 +95,7 @@ model Warehouse{
   of_store_id String
   store Store @relation(fields: [of_store_id], references: [id], onDelete: NoAction)
   products Product[]
+  created_at DateTime @default(now())
 }
 model Product{
   id String @id @default(uuid())
@@ -101,6 +109,7 @@ model Product{
   warehouse_id String
   warehouse Warehouse @relation(fields: [warehouse_id], references: [id], onDelete: NoAction)
   sale_items SaleItem[]
+  created_at DateTime @default(now())
 }
 model Sales{
   id String @id @default(uuid())
@@ -121,4 +130,5 @@ model SaleItem{
   quantity Int
   unit_price Decimal @db.Decimal(10, 2)
   total_price Decimal @db.Decimal(10, 2)
+  created_at DateTime @default(now())
 }

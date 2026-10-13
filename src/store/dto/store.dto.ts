@@ -20,3 +20,20 @@ export class CreateStoreDto {
   @IsString()
   store_net_id: string;
 }
+export class UpdateStoreDto {
+  @IsOptional()
+  @IsString()
+  name?: string;
+  @IsOptional()
+  @IsString()
+  description?: string;
+  @IsOptional()
+  @IsString()
+  number?: string;
+  @IsOptional()
+  @IsString()
+  address?: string;
+  @IsUrl()
+  @IsOptional()
+  map_url?: string;
+}
